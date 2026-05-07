@@ -19,9 +19,11 @@ public class ImageService {
 
     public ImageUploadResult uploadImage(MultipartFile file) {
         try {
+            log.info("Starting image upload to Cloudinary");
             Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
             String publicId = uploadResult.get("public_id").toString();
             String url = uploadResult.get("secure_url").toString();
+            log.info("Image uploaded successfully. public_id: {}", publicId);
             return new ImageUploadResult(url, publicId);
         } catch (IOException e) {
             log.error("Failed to upload image to Cloudinary", e);
@@ -34,7 +36,9 @@ public class ImageService {
             return;
         }
         try {
+            log.info("Deleting image from Cloudinary. public_id: {}", publicId);
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            log.info("Image deleted successfully. public_id: {}", publicId);
         } catch (IOException e) {
             log.error("Failed to delete image from Cloudinary. public_id: " + publicId, e);
             // Non-critical failure, don't block deletion logic

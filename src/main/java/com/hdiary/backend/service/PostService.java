@@ -16,8 +16,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
 
     private final PostRepository postRepository;
@@ -26,8 +29,12 @@ public class PostService {
 
     @Transactional
     public PostResponse createPost(PostCreateRequest request) {
+        log.info("Creating new post for user id: {}", request.userId());
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new UserNotFoundException("Không tìm thấy người dùng."));
+                .orElseThrow(() -> {
+                    log.warn("Create post failed: User not found with id: {}", request.userId());
+                    return new UserNotFoundException("Không tìm thấy người dùng.");
+                });
 
         String imageUrl = null;
         String imagePublicId = null;
@@ -49,6 +56,7 @@ public class PostService {
                 .build();
 
         Post savedPost = postRepository.save(post);
+        log.info("Post created successfully with id: {}", savedPost.getId());
         return PostResponse.fromEntity(savedPost);
     }
 
@@ -68,13 +76,18 @@ public class PostService {
 
     @Transactional
     public void deletePost(Long postId) {
+        log.info("Attempting to delete post id: {}", postId);
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Không tìm thấy bài viết."));
+                .orElseThrow(() -> {
+                    log.warn("Delete post failed: Post not found with id: {}", postId);
+                    return new PostNotFoundException("Không tìm thấy bài viết.");
+                });
                 
         if (post.getImagePublicId() != null) {
             imageService.deleteImage(post.getImagePublicId());
         }
         
         postRepository.delete(post);
+        log.info("Post deleted successfully with id: {}", postId);
     }
 }
