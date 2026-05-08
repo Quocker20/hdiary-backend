@@ -26,7 +26,7 @@ public class StatisticsService {
     private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
-    public StatisticsResponseDto getMoodStatistics(Long userId) {
+    public StatisticsResponseDto getMoodStatistics() {
         LocalDate today = LocalDate.now();
         
         // Daily range
@@ -37,8 +37,8 @@ public class StatisticsService {
         LocalDateTime startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).atStartOfDay();
         LocalDateTime endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY)).atTime(LocalTime.MAX);
 
-        List<MoodCountProjection> dailyProjections = postRepository.countMoodsByUserIdAndDateRange(userId, startOfDay, endOfDay);
-        List<MoodCountProjection> weeklyProjections = postRepository.countMoodsByUserIdAndDateRange(userId, startOfWeek, endOfWeek);
+        List<MoodCountProjection> dailyProjections = postRepository.countMoodsByDateRange(startOfDay, endOfDay);
+        List<MoodCountProjection> weeklyProjections = postRepository.countMoodsByDateRange(startOfWeek, endOfWeek);
         
         return new StatisticsResponseDto(
                 mapToDto(dailyProjections),

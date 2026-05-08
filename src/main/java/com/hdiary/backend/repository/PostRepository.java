@@ -21,9 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @EntityGraph(attributePaths = { "user" })
     Slice<Post> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
-    @Query("SELECT p.mood AS mood, COUNT(p) AS count FROM Post p WHERE p.user.id = :userId AND p.createdAt >= :startDate AND p.createdAt <= :endDate GROUP BY p.mood")
-    List<MoodCountProjection> countMoodsByUserIdAndDateRange(
-            @Param("userId") Long userId,
+    @Query("SELECT p.mood AS mood, COUNT(p) AS count FROM Post p WHERE p.createdAt >= :startDate AND p.createdAt <= :endDate GROUP BY p.mood")
+    List<MoodCountProjection> countMoodsByDateRange(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );

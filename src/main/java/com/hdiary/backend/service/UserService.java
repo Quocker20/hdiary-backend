@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,7 +22,15 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final ImageService imageService;
-    
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllUsers() {
+        log.info("Fetching all users");
+        return userRepository.findAll().stream()
+                .map(UserResponse::fromEntity)
+                .toList();
+    }
+
     public UserResponse login(LoginRequest request) {
         log.info("Attempting to login user: {}", request.username());
         User user = userRepository.findByUsername(request.username())

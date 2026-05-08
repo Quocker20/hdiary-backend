@@ -16,8 +16,8 @@ public class StatisticsController {
     private final StatisticsService statisticsService;
 
     @GetMapping("/mood")
-    public ResponseEntity<StatisticsResponseDto> getMoodStatistics(@RequestParam Long userId) {
-        log.info("Received request to get mood statistics for user id: {}", userId);
-        return ResponseEntity.ok(statisticsService.getMoodStatistics(userId));
+    public ResponseEntity<StatisticsResponseDto> getMoodStatistics() {
+        log.info("Received request to get global mood statistics");
+        return ResponseEntity.ok(statisticsService.getMoodStatistics());
     }
 }
