@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 
 public record PostResponse(
     Long id,
-    Long userId,
-    String displayName,
+    UserResponse user,
     PostType postType,
     EventCategory eventCategory,
     Mood mood,
@@ -22,8 +21,7 @@ public record PostResponse(
     public static PostResponse fromEntity(Post post) {
         return new PostResponse(
             post.getId(),
-            post.getUser().getId(),
-            post.getUser().getDisplayName(),
+            UserResponse.fromEntity(post.getUser()),
             post.getPostType(),
             post.getEventCategory(),
             post.getMood(),
