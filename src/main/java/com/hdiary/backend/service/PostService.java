@@ -69,6 +69,12 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public SliceResponse<PostResponse> getUserTimeline(Long userId, int page, int size) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("Get user timeline failed: User not found with id: {}", userId);
+                    return new UserNotFoundException("Không tìm thấy người dùng.");
+                });
+
         Pageable pageable = PageRequest.of(page, size);
         Slice<Post> postSlice = postRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
         return SliceResponse.from(postSlice.map(PostResponse::fromEntity));
@@ -82,11 +88,11 @@ public class PostService {
                     log.warn("Delete post failed: Post not found with id: {}", postId);
                     return new PostNotFoundException("Không tìm thấy bài viết.");
                 });
-                
+
         if (post.getImagePublicId() != null) {
             imageService.deleteImage(post.getImagePublicId());
         }
-        
+
         postRepository.delete(post);
         log.info("Post deleted successfully with id: {}", postId);
     }
